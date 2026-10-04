@@ -27,8 +27,8 @@ The project demonstrates **networking, exception handling, input validation, and
 ---
 
 ## 📂 How to Run
-
-1. Start the server first:
+## I shared the server.py and the client.py above
+ Start the server an then the client:
 
 ```bash
 python server.py
