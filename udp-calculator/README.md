@@ -1,5 +1,7 @@
 # 🧮 UDP Calculator
 
+[![Live demo](https://img.shields.io/badge/▶_Live_demo-Open_project_page-0f9d76?style=for-the-badge)](https://yoavbvd.github.io/Python-Projects/)
+
 A small **client–server calculator** that talks over **UDP**, written in pure Python.
 The client sends a calculation such as `12 * 7`. The server checks it, calculates, and sends back `84`.
 
