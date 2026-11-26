@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UDP Calculator · Python Projects</title>
+<meta name="description" content="A hardened client–server calculator over UDP, written in pure Python. By Yoav Batat van Dien.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f7f8fb;
+    --surface: #ffffff;
+    --surface-2: #eef1f6;
+    --text: #0f172a;
+    --muted: #526078;
+    --border: #dde3ec;
+    --accent: #0f9d76;
+    --accent-2: #2563eb;
+    --accent-soft: #e3f6ef;
+    --danger: #d23f3f;
+    --term-bg: #0b1220;
+    --term-text: #d6e2f5;
+    --term-muted: #7c8aa5;
+    --shadow: 0 1px 2px rgba(15,23,42,.06), 0 8px 24px rgba(15,23,42,.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0a0f1a; --surface: #111827; --surface-2: #172033; --text: #e6edf7;
+      --muted: #94a3b8; --border: #243049; --accent: #34d399; --accent-2: #60a5fa;
+      --accent-soft: #0f2a24; --danger: #f87171; --term-bg: #060a12;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0a0f1a; --surface: #111827; --surface-2: #172033; --text: #e6edf7;
+    --muted: #94a3b8; --border: #243049; --accent: #34d399; --accent-2: #60a5fa;
+    --accent-soft: #0f2a24; --danger: #f87171; --term-bg: #060a12;
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 16px/1.6 Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  code, pre, .mono { font-family: "JetBrains Mono", ui-monospace, Menlo, monospace; }
+  a { color: var(--accent-2); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 16px; }
+
+  /* Nav */
+  nav { position: sticky; top: 0; z-index: 10; backdrop-filter: blur(10px);
+        background: color-mix(in srgb, var(--bg) 82%, transparent); border-bottom: 1px solid var(--border); }
+  nav .wrap { display: flex; align-items: center; gap: 20px; height: 56px; }
+  .brand { font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 8px; }
+  .brand:hover { text-decoration: none; }
+  .nav-links { display: flex; gap: 18px; margin-left: auto; font-size: 14px; }
+  .nav-links a { color: var(--muted); }
+  .nav-links a:hover { color: var(--text); text-decoration: none; }
+  .theme-btn { border: 1px solid var(--border); background: var(--surface); color: var(--text);
+               border-radius: 8px; width: 34px; height: 34px; cursor: pointer; font-size: 15px; }
+  @media (max-width: 640px) { .nav-links a.opt { display: none; } }
+
+  /* Hero */
+  header.hero { padding: 72px 0 48px; }
+  .hero-grid { display: grid; grid-template-columns: 1.05fr 1fr; gap: 40px; align-items: center; }
+  @media (max-width: 860px) { .hero-grid { grid-template-columns: 1fr; } header.hero { padding-top: 40px; } }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600;
+             color: var(--accent); background: var(--accent-soft); padding: 4px 12px; border-radius: 999px; }
+  h1 { font-size: clamp(36px, 6vw, 56px); line-height: 1.05; margin: 16px 0; letter-spacing: -0.03em; font-weight: 800; }
+  h1 .grad { background: linear-gradient(90deg, var(--accent), var(--accent-2)); -webkit-background-clip: text;
+             background-clip: text; color: transparent; }
+  .lead { font-size: 18px; color: var(--muted); max-width: 520px; }
+  .badges { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 28px; }
+  .badge { font-size: 13px; padding: 4px 10px; border-radius: 6px; background: var(--surface);
+           border: 1px solid var(--border); color: var(--muted); }
+  .cta { display: flex; gap: 12px; flex-wrap: wrap; }
+  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 11px 18px; border-radius: 10px;
+         font-weight: 600; font-size: 15px; border: 1px solid var(--border); color: var(--text); background: var(--surface); }
+  .btn:hover { text-decoration: none; border-color: var(--muted); }
+  .btn.primary { background: var(--text); color: var(--bg); border-color: var(--text); }
+  .btn.primary:hover { opacity: .9; }
+
+  /* Terminal / demo */
+  .term { background: var(--term-bg); color: var(--term-text); border-radius: 14px; box-shadow: var(--shadow);
+          overflow: hidden; border: 1px solid #1c2740; }
+  .term-bar { display: flex; align-items: center; gap: 7px; padding: 11px 14px; background: rgba(255,255,255,.04);
+              border-bottom: 1px solid rgba(255,255,255,.06); }
+  .dot { width: 11px; height: 11px; border-radius: 50%; }
+  .term-title { margin-left: 8px; font-size: 12px; color: var(--term-muted); }
+  .term-body { padding: 16px 18px; font-size: 14px; min-height: 230px; max-height: 300px; overflow-y: auto; }
+  .term-body .line { white-space: pre-wrap; word-break: break-word; }
+  .c-muted { color: var(--term-muted); } .c-ok { color: #4ade80; } .c-err { color: #f87171; } .c-in { color: #93c5fd; }
+  .demo-form { display: flex; gap: 8px; padding: 12px 14px; border-top: 1px solid rgba(255,255,255,.06); flex-wrap: wrap; }
+  .demo-form input, .demo-form select {
+    background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12); color: var(--term-text);
+    border-radius: 8px; padding: 8px 10px; font: 14px "JetBrains Mono", monospace; min-width: 0; }
+  .demo-form input { flex: 1 1 80px; }
+  .demo-form select { flex: 0 0 64px; }
+  .demo-form button { flex: 0 0 auto; background: #34d399; color: #04261b; border: 0; border-radius: 8px;
+                      padding: 8px 14px; font-weight: 700; cursor: pointer; }
+  .demo-note { font-size: 12.5px; color: var(--muted); margin-top: 10px; text-align: center; }
+
+  /* Sections */
+  section { padding: 56px 0; border-top: 1px solid var(--border); }
+  h2 { font-size: 30px; letter-spacing: -0.02em; margin: 0 0 8px; }
+  .sub { color: var(--muted); margin: 0 0 32px; max-width: 640px; }
+
+  .flow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; counter-reset: step; }
+  @media (max-width: 860px) { .flow { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 520px) { .flow { grid-template-columns: 1fr; } }
+  .step { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; position: relative; }
+  .step::before { counter-increment: step; content: counter(step); display: grid; place-items: center;
+                  width: 28px; height: 28px; border-radius: 8px; background: var(--accent-soft); color: var(--accent);
+                  font-weight: 700; font-size: 14px; margin-bottom: 12px; }
+  .step h3 { margin: 0 0 6px; font-size: 16px; }
+  .step p { margin: 0; color: var(--muted); font-size: 14.5px; }
+  .step code { font-size: 13px; background: var(--surface-2); padding: 1px 6px; border-radius: 5px; }
+
+  .packet { margin-top: 28px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+            padding: 20px; display: flex; align-items: center; justify-content: center; gap: 16px; flex-wrap: wrap; }
+  .node { padding: 12px 20px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface-2);
+          font-weight: 600; text-align: center; }
+  .node small { display: block; font-weight: 400; color: var(--muted); font-size: 12px; }
+  .arrows { display: flex; flex-direction: column; gap: 6px; font-size: 13px; min-width: 180px; }
+  .arrows .mono { display: flex; align-items: center; gap: 8px; }
+  .arrows .r { color: var(--accent-2); } .arrows .l { color: var(--accent); justify-content: flex-end; }
+
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  @media (max-width: 860px) { .grid3 { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 560px) { .grid3 { grid-template-columns: 1fr; } }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 22px; }
+  .card .ic { font-size: 22px; }
+  .card h3 { margin: 10px 0 6px; font-size: 16px; }
+  .card p { margin: 0; color: var(--muted); font-size: 14.5px; }
+
+  .install { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; }
+  @media (max-width: 860px) { .install { grid-template-columns: 1fr; } }
+  .install > div, .hero-grid > div { min-width: 0; }
+  .lead code { font-size: 15px; background: var(--surface-2); padding: 1px 7px; border-radius: 6px; color: var(--text); }
+  .codeblock { position: relative; background: var(--term-bg); color: var(--term-text); border-radius: 10px;
+               padding: 14px 16px; font-size: 14px; margin: 8px 0 18px; overflow-x: auto; }
+  .codeblock pre { margin: 0; }
+  .codeblock .cm { color: var(--term-muted); }
+  .copy { position: absolute; top: 8px; right: 8px; font-size: 12px; border: 1px solid rgba(255,255,255,.15);
+          background: rgba(255,255,255,.06); color: var(--term-text); border-radius: 6px; padding: 3px 9px; cursor: pointer; }
+  .label { font-size: 13px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+  table { width: 100%; border-collapse: collapse; background: var(--surface); border: 1px solid var(--border);
+          border-radius: 12px; overflow: hidden; font-size: 14.5px; }
+  th, td { text-align: left; padding: 11px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { background: var(--surface-2); font-size: 13px; color: var(--muted); font-weight: 600; }
+  tr:last-child td { border-bottom: 0; }
+  td code { font-size: 13px; background: var(--surface-2); padding: 1px 6px; border-radius: 5px; }
+
+  .skills { display: flex; flex-wrap: wrap; gap: 10px; }
+  .chip { padding: 8px 14px; border-radius: 999px; background: var(--surface); border: 1px solid var(--border); font-size: 14px; }
+
+  footer { border-top: 1px solid var(--border); padding: 32px 0 48px; color: var(--muted); font-size: 14px; }
+  footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a class="brand" href="#">🧮 UDP Calculator</a>
+    <div class="nav-links">
+      <a href="#how" class="opt">How it works</a>
+      <a href="#security" class="opt">Security</a>
+      <a href="#install">Install</a>
+      <a href="https://github.com/yoavbvd/Python-Projects/tree/main/udp-calculator">GitHub</a>
+    </div>
+    <button class="theme-btn" id="themeBtn" aria-label="Toggle dark mode">◐</button>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <span class="eyebrow">● Python networking project</span>
+      <h1>A calculator that speaks <span class="grad">UDP</span>.</h1>
+      <p class="lead">A small client–server app in pure Python. The client sends <code>12 * 7</code>, the server checks it and replies <code>84</code>, with rate limiting and protection against abuse.</p>
+      <div class="badges">
+        <span class="badge">Python 3.8+</span>
+        <span class="badge">No dependencies</span>
+        <span class="badge">Tested with unittest</span>
+        <span class="badge">MIT License</span>
+      </div>
+      <div class="cta">
+        <a class="btn primary" href="#install">Get started →</a>
+        <a class="btn" href="https://github.com/yoavbvd/Python-Projects/tree/main/udp-calculator">View source</a>
+      </div>
+    </div>
+
+    <div>
+      <div class="term" aria-label="Interactive demo">
+        <div class="term-bar">
+          <span class="dot" style="background:#ff5f57"></span>
+          <span class="dot" style="background:#febc2e"></span>
+          <span class="dot" style="background:#28c840"></span>
+          <span class="term-title mono">client.py → 127.0.0.1:9081</span>
+        </div>
+        <div class="term-body mono" id="log">
+          <div class="line c-muted">UDP Calculator  -&gt;  server 127.0.0.1:9081</div>
+          <div class="line c-muted">Try it: enter two numbers and an operator.</div>
+        </div>
+        <form class="demo-form" id="demo" autocomplete="off">
+          <input id="n1" inputmode="numeric" value="12" aria-label="First number">
+          <select id="op" aria-label="Operator"><option>+</option><option>-</option><option selected>*</option><option>/</option></select>
+          <input id="n2" inputmode="numeric" value="7" aria-label="Second number">
+          <button type="submit">Send</button>
+        </form>
+      </div>
+      <p class="demo-note">This demo runs in your browser and uses the same rules as the real server, including the rate limit of 10 requests per 30 seconds.</p>
+    </div>
+  </div>
+</header>
+
+<section id="how">
+  <div class="wrap">
+    <h2>How it works</h2>
+    <p class="sub">One UDP packet goes out, one comes back. Both sides check the input, but the server never trusts the client.</p>
+    <div class="flow">
+      <div class="step"><h3>Ask</h3><p>The client asks for two numbers and an operator, and checks them locally.</p></div>
+      <div class="step"><h3>Send</h3><p>It sends one UDP message: <code>&lt;num1&gt; &lt;op&gt; &lt;num2&gt;</code>.</p></div>
+      <div class="step"><h3>Check</h3><p>The server checks the rate limit, then validates the format, range and operator.</p></div>
+      <div class="step"><h3>Reply</h3><p>The server sends back the result, or a message that starts with <code>ERROR:</code>.</p></div>
+    </div>
+    <div class="packet">
+      <div class="node">client.py<small>your terminal</small></div>
+      <div class="arrows mono">
+        <div class="r">"12 * 7" ───────►</div>
+        <div class="l">◄─────── "84"</div>
+      </div>
+      <div class="node">server.py<small>UDP port 9081</small></div>
+    </div>
+  </div>
+</section>
+
+<section id="security">
+  <div class="wrap">
+    <h2>Built with security in mind</h2>
+    <p class="sub">UDP has no connections and no handshake, so the server must protect itself. These are the defenses.</p>
+    <div class="grid3">
+      <div class="card"><div class="ic">✅</div><h3>Validation on both sides</h3><p>The client checks input for a good experience. The server checks again: format, integer range −9999…9999, operator and division by zero.</p></div>
+      <div class="card"><div class="ic">⏱️</div><h3>Rate limit per IP</h3><p>10 requests per 30 seconds for each IP address. The key is the IP only, so a client cannot bypass the limit by opening new sockets.</p></div>
+      <div class="card"><div class="ic">🔇</div><h3>Silent drop</h3><p>A rate-limited request gets no reply. A spoofed source address cannot use the server to flood a victim (UDP reflection).</p></div>
+      <div class="card"><div class="ic">🧹</div><h3>Memory cleanup</h3><p>Idle clients are removed from the rate-limit table, so a flood of fake addresses cannot fill the memory.</p></div>
+      <div class="card"><div class="ic">🏠</div><h3>Local by default</h3><p>The server listens on <code>127.0.0.1</code>. You must choose <code>--host 0.0.0.0</code> to open it to the network.</p></div>
+      <div class="card"><div class="ic">🧱</div><h3>Never crashes</h3><p>Bad bytes, a bad format and network errors are handled. The server continues to run.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="install">
+  <div class="wrap">
+    <h2>Install &amp; run</h2>
+    <p class="sub">You need Python 3.8 or later. There is nothing to install: the project uses only the standard library.</p>
+    <div class="install">
+      <div>
+        <div class="label">1 · Get the code</div>
+        <div class="codeblock"><button class="copy">Copy</button><pre>git clone https://github.com/yoavbvd/Python-Projects.git
+cd Python-Projects/udp-calculator</pre></div>
+        <div class="label">2 · Terminal 1: start the server</div>
+        <div class="codeblock"><button class="copy">Copy</button><pre>python3 server.py</pre></div>
+        <div class="label">3 · Terminal 2: start the client</div>
+        <div class="codeblock"><button class="copy">Copy</button><pre>python3 client.py</pre></div>
+        <p class="demo-note" style="text-align:left">On Windows, use <code>python</code> instead of <code>python3</code>.</p>
+      </div>
+      <div>
+        <div class="label">Options</div>
+        <div class="codeblock"><button class="copy">Copy</button><pre><span class="cm"># accept clients from your LAN</span>
+python3 server.py --host 0.0.0.0 --port 9090
+python3 client.py --host 192.168.1.20 --port 9090</pre></div>
+        <div class="label">Run the tests</div>
+        <div class="codeblock"><button class="copy">Copy</button><pre>python3 -m unittest discover -s tests -v</pre></div>
+        <table>
+          <tr><th>Rule</th><th>Value</th></tr>
+          <tr><td>Message</td><td><code>&lt;num1&gt; &lt;op&gt; &lt;num2&gt;</code></td></tr>
+          <tr><td>Numbers</td><td>Integers, −9999 … 9999</td></tr>
+          <tr><td>Operators</td><td><code>+</code> <code>-</code> <code>*</code> <code>/</code></td></tr>
+          <tr><td>Rate limit</td><td>10 requests / 30 s per IP</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Skills practiced</h2>
+    <p class="sub">What this project shows.</p>
+    <div class="skills">
+      <span class="chip">🔌 UDP sockets</span>
+      <span class="chip">📡 Protocol design</span>
+      <span class="chip">✅ Input validation</span>
+      <span class="chip">⚠️ Exception handling</span>
+      <span class="chip">🛡️ Rate limiting &amp; DoS mitigation</span>
+      <span class="chip">🔁 UDP reflection defense</span>
+      <span class="chip">⌨️ argparse CLI</span>
+      <span class="chip">🧪 unittest</span>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>Made by <strong>Yoav Batat van Dien</strong> · <a href="https://github.com/yoavbvd">@yoavbvd</a></span>
+    <span><a href="https://github.com/yoavbvd/Python-Projects">Python Projects</a> · MIT License</span>
+  </div>
+</footer>
+
+<script>
+  // Theme toggle (remembered per browser)
+  (function () {
+    var root = document.documentElement, key = "udp-calc-theme";
+    try { var saved = localStorage.getItem(key); if (saved) root.setAttribute("data-theme", saved); } catch (e) {}
+    document.getElementById("themeBtn").addEventListener("click", function () {
+      var dark = root.getAttribute("data-theme") === "dark" ||
+        (!root.getAttribute("data-theme") && matchMedia("(prefers-color-scheme: dark)").matches);
+      var next = dark ? "light" : "dark";
+      root.setAttribute("data-theme", next);
+      try { localStorage.setItem(key, next); } catch (e) {}
+    });
+  })();
+
+  // Copy buttons
+  document.querySelectorAll(".copy").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var text = btn.parentElement.querySelector("pre").innerText;
+      navigator.clipboard.writeText(text).then(function () {
+        btn.textContent = "Copied"; setTimeout(function () { btn.textContent = "Copy"; }, 1500);
+      });
+    });
+  });
+
+  // Demo: same rules as server.py
+  (function () {
+    var MIN = -9999, MAX = 9999, LIMIT = 10, WINDOW = 30000, sent = [];
+    var log = document.getElementById("log");
+    function line(text, cls) {
+      var d = document.createElement("div"); d.className = "line " + (cls || ""); d.textContent = text;
+      log.appendChild(d); log.scrollTop = log.scrollHeight;
+    }
+    function server(msg) {
+      var now = Date.now();
+      sent = sent.filter(function (t) { return now - t < WINDOW; });
+      if (sent.length >= LIMIT) return null;           // dropped: no reply
+      sent.push(now);
+      var p = msg.trim().split(/\s+/);
+      if (p.length !== 3) return "ERROR: invalid message format, expected: <num1> <op> <num2>";
+      if (!/^[+-]?\d+$/.test(p[0]) || !/^[+-]?\d+$/.test(p[2])) return "ERROR: numbers must be integers";
+      var a = parseInt(p[0], 10), op = p[1], b = parseInt(p[2], 10);
+      if (a < MIN || a > MAX) return "ERROR: number1 out of range (-9999..9999)";
+      if (b < MIN || b > MAX) return "ERROR: number2 out of range (-9999..9999)";
+      if ("+-*/".indexOf(op) < 0 || op.length !== 1) return "ERROR: invalid operator, use + - * /";
+      if (op === "/" && b === 0) return "ERROR: division by zero";
+      var r = op === "+" ? a + b : op === "-" ? a - b : op === "*" ? a * b : a / b;
+      if (!Number.isInteger(r)) r = Math.round(r * 1e6) / 1e6;
+      return String(r);
+    }
+    document.getElementById("demo").addEventListener("submit", function (e) {
+      e.preventDefault();
+      var msg = [document.getElementById("n1").value.trim(), document.getElementById("op").value,
+                 document.getElementById("n2").value.trim()].join(" ");
+      line("$ send \"" + msg + "\"", "c-in");
+      var reply = server(msg);
+      setTimeout(function () {
+        if (reply === null) line("ERROR: no reply from server (rate limited: 10 requests / 30 s)", "c-err");
+        else if (reply.indexOf("ERROR") === 0) line(reply, "c-err");
+        else line(msg + " = " + reply, "c-ok");
+      }, 180);
+    });
+  })();
+</script>
+</body>
+</html>
