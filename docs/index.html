@@ -159,6 +159,20 @@
   .skills { display: flex; flex-wrap: wrap; gap: 10px; }
   .chip { padding: 8px 14px; border-radius: 999px; background: var(--surface); border: 1px solid var(--border); font-size: 14px; }
 
+  .timeline { list-style: none; margin: 0; padding: 0 0 0 28px; position: relative; }
+  .timeline::before { content: ""; position: absolute; left: 7px; top: 6px; bottom: 6px; width: 2px; background: var(--border); }
+  .timeline li { position: relative; background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+                 padding: 18px 20px; margin-bottom: 16px; }
+  .timeline li::before { content: ""; position: absolute; left: -27px; top: 22px; width: 12px; height: 12px; border-radius: 50%;
+                         background: var(--surface); border: 2px solid var(--muted); }
+  .timeline li.now::before { background: var(--accent); border-color: var(--accent); }
+  .timeline time { font-size: 13px; font-weight: 600; color: var(--accent); }
+  .timeline h3 { margin: 4px 0 6px; font-size: 17px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .timeline p { margin: 0; color: var(--muted); font-size: 14.5px; }
+  .timeline code { font-size: 13px; background: var(--surface-2); padding: 1px 6px; border-radius: 5px; }
+  .tag { font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 999px; background: var(--surface-2); color: var(--muted); }
+  .tag.new { background: var(--accent-soft); color: var(--accent); }
+
   footer { border-top: 1px solid var(--border); padding: 32px 0 48px; color: var(--muted); font-size: 14px; }
   footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
 </style>
@@ -172,6 +186,7 @@
       <a href="#how" class="opt">How it works</a>
       <a href="#security" class="opt">Security</a>
       <a href="#install">Install</a>
+      <a href="#history" class="opt">History</a>
       <a href="https://github.com/yoavbvd/Python-Projects/tree/main/udp-calculator">GitHub</a>
     </div>
     <button class="theme-btn" id="themeBtn" aria-label="Toggle dark mode">◐</button>
@@ -304,6 +319,31 @@ python3 client.py --host 192.168.1.20 --port 9090</pre></div>
       <span class="chip">⌨️ argparse CLI</span>
       <span class="chip">🧪 unittest</span>
     </div>
+  </div>
+</section>
+
+<section id="history">
+  <div class="wrap">
+    <h2>Project history</h2>
+    <p class="sub">This project started as a hard-coded command-line version. It was upgraded later with this live demo GUI.</p>
+    <ol class="timeline">
+      <li>
+        <time datetime="2025-12-20">20 December 2025</time>
+        <h3>v1.0 · Original version <span class="tag">Hard-coded</span></h3>
+        <p>The server and the client run only in the terminal. The settings are hard-coded in the source code: server address <code>0.0.0.0</code>, port <code>9081</code>, range limits and rate limits. To change them, you must edit the code.</p>
+      </li>
+      <li>
+        <time datetime="2026-10-04">4 October 2026</time>
+        <h3>v1.0 · Documentation</h3>
+        <p>The README gets instructions on how to run the server and the client.</p>
+      </li>
+      <li class="now">
+        <time datetime="2026-11-26">26 November 2026</time>
+        <h3>v2.0 · Upgrade <span class="tag new">Live demo GUI</span></h3>
+        <p>Clean structure, <code>--host</code> and <code>--port</code> options instead of hard-coded values, security fixes (rate limit per IP, memory cleanup, silent drop against UDP reflection, local-only by default), automated tests, and this project page with a live demo that runs in the browser.</p>
+      </li>
+    </ol>
+    <p class="demo-note" style="text-align:left">The live demo uses the same rules as <code>server.py</code>, but it runs only in your browser. It does not connect to a real server.</p>
   </div>
 </section>
 
