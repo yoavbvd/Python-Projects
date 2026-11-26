@@ -2,7 +2,9 @@
 
 Python projects about networking and security, by **Yoav Batat van Dien**.
 
-🌐 **Project page:** https://yoavbvd.github.io/Python-Projects/
+[![Live demo](https://img.shields.io/badge/▶_Live_demo-Open_project_page-0f9d76?style=for-the-badge)](https://yoavbvd.github.io/Python-Projects/)
+
+Try the interactive calculator demo on the project page: https://yoavbvd.github.io/Python-Projects/
 
 ---
 
