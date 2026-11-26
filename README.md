@@ -1,40 +1,34 @@
-# UDP Calculator – Python Project
-Author: Yoav Batat van Dien
+# 🐍 Python Projects
+
+Python projects about networking and security, by **Yoav Batat van Dien**.
+
+🌐 **Project page:** https://yoavbvd.github.io/Python-Projects/
 
 ---
 
-## Project Overview
+## Projects
 
-This project implements a **UDP-based calculator** with a client-server architecture in Python.  
-
-- The **client** sends arithmetic operations to the server and receives results.  
-- The **server** validates input, calculates results, handles errors, and prevents DoS via rate limiting.  
-
-The project demonstrates **networking, exception handling, input validation, and basic server hardening techniques**.
+| Project | Description | Topics |
+|---|---|---|
+| [🧮 UDP Calculator](udp-calculator/) | A client–server calculator over UDP, with input validation, per-IP rate limiting and protection against UDP reflection. | `socket` · `UDP` · validation · rate limiting · `unittest` |
 
 ---
 
-## 🛠 Skills Practiced
+## Run a project
 
-- Python programming & scripting  
-- UDP networking (`socket`)  
-- Input validation and exception handling  
-- Client-server communication  
-- Rate limiting / DoS prevention  
-- Logging and safe server practices  
-- Handling network timeouts and errors  
-
----
-
-## 📂 How to Run
-
-1. Start the server first:
+Each project has its own folder and its own README with full instructions. For example:
 
 ```bash
-python server.py
-Run the client in another terminal:
+git clone https://github.com/yoavbvd/Python-Projects.git
+cd Python-Projects/udp-calculator
+python3 server.py      # terminal 1
+python3 client.py      # terminal 2
+```
 
-bash
-Copy code
-python client.py
-Follow prompts in the client for numbers and operators (+, -, *, /).
+All projects use only the Python standard library (Python 3.8+), unless the project README says otherwise.
+
+---
+
+## License
+
+[MIT](LICENSE.md) © Yoav Batat van Dien
