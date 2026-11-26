@@ -141,6 +141,20 @@ udp-calculator/
 
 ---
 
+## 🕓 Project history
+
+This project started as a **hard-coded command-line version**. It was **upgraded later** with configurable settings, security fixes, tests, and a project page with a live demo GUI.
+
+| Date | Version | What changed |
+|---|---|---|
+| **20 December 2025** | v1.0 – original | First release. The server and the client run only in the terminal. The settings are hard-coded in the source code: server address `0.0.0.0`, port `9081`, range limits and rate limits. To change them, you must edit the code. |
+| **4 October 2026** | v1.0 – docs | The README gets instructions on how to run the server and the client. |
+| **26 November 2026** | v2.0 – upgrade | Clean structure (`server.py`, `client.py`). The `--host` and `--port` options replace the hard-coded address and port. Security fixes: rate limit per IP, memory cleanup, silent drop against UDP reflection, local-only by default. Automated tests. **Project page with a live demo GUI** that runs in the browser: [yoavbvd.github.io/Python-Projects](https://yoavbvd.github.io/Python-Projects/). |
+
+> The live demo runs in your browser and uses the same rules as `server.py`. It does not connect to a real server. To use real UDP, run `server.py` and `client.py` as shown in [Quick start](#-quick-start).
+
+---
+
 ## 👤 Author
 
 **Yoav Batat van Dien** · [GitHub @yoavbvd](https://github.com/yoavbvd)
